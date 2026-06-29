@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Model Size Checker</title>
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+<style>
+  body { background:#111; color:#fff; font-family:monospace; padding:20px; }
+  model-viewer { width:100%; height:300px; }
+  #info { margin-top:20px; background:#1e1e1e; padding:16px; border-radius:8px; font-size:14px; line-height:2; }
+  .ok { color:#4ade80; } .warn { color:#facc15; } .err { color:#f87171; }
+</style>
+</head>
+<body>
+<h3>🔍 GLB Size Checker</h3>
+<model-viewer id="mv" src="assets/car.glb" camera-controls auto-rotate></model-viewer>
+<div id="info">Загрузка модели...</div>
+
+<script>
+const mv = document.getElementById('mv');
+mv.addEventListener('load', () => {
+  const box = mv.getDimensions(); // returns {x, y, z} in meters
+  const w = box.x.toFixed(3);
+  const h = box.y.toFixed(3);
+  const d = box.z.toFixed(3);
+
+  const idealW = 4.5; // Rolls-Royce Cullinan ~4.85m
+  const ratio = (box.x / idealW).toFixed(2);
+
+  let status = '';
+  let advice = '';
+
+  if (box.x > 3 && box.x < 6) {
+    status = '<span class="ok">✅ Размер корректный — AR должен работать</span>';
+    advice = 'Модель уже в реальных метрах. Попробуй убрать ar-scale и добавить ar-placement="floor"';
+  } else if (box.x < 1) {
+    status = '<span class="err">❌ Модель слишком маленькая</span>';
+    advice = `Нужно scale × ${(idealW / box.x).toFixed(0)} в Blender/GLTF или добавить scale="${(idealW / box.x).toFixed(2)}" в model-viewer`;
+  } else {
+    status = '<span class="warn">⚠️ Нестандартный размер</span>';
+    advice = `Ожидаемая ширина ~4.85м, у модели ${w}м. Ratio: ${ratio}`;
+  }
+
+  // Materials info
+  let mats = '';
+  if (mv.model && mv.model.materials) {
+    mats = mv.model.materials.map((m, i) => `  [${i}] "${m.name || '(без имени)'}"`).join('\n');
+  }
+
+  document.getElementById('info').innerHTML = `
+    <b>Размеры модели:</b><br>
+    Ширина (X): <b>${w} м</b><br>
+    Высота (Y): <b>${h} м</b><br>
+    Длина  (Z): <b>${d} м</b><br><br>
+    <b>Статус:</b> ${status}<br>
+    <b>Совет:</b> ${advice}<br><br>
+    <b>Материалы (${mv.model?.materials?.length ?? 0} шт):</b><br>
+    <pre>${mats}</pre>
+  `;
+});
+</script>
+</body>
+</html>
