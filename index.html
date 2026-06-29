@@ -298,11 +298,10 @@
   shadow-softness="0.8"
   exposure="1.1"
   environment-image="neutral"
-  camera-orbit="30deg 70deg 12m"
-  min-camera-orbit="auto 10deg 6m"
-  max-camera-orbit="auto 80deg 24m"
-  field-of-view="30deg"
-  disable-zoom>
+  camera-orbit="30deg 75deg 105%"
+  min-camera-orbit="auto 5deg 80%"
+  max-camera-orbit="auto 85deg 200%"
+  field-of-view="40deg">
 </model-viewer>
 
 <!-- CENTER INFO -->
@@ -452,8 +451,8 @@
   mv.addEventListener('load', () => {
     loader.classList.add('hidden');
     // Жёстко фиксируем камеру — не даём model-viewer прыгать после загрузки
-    mv.cameraOrbit = '30deg 70deg 12m';
-    mv.fieldOfView = '30deg';
+    mv.cameraOrbit = '30deg 75deg 105%';
+    mv.fieldOfView = '40deg';
   });
 
   // ── Color change (material "colored" = кузов) ──
